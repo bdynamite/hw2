@@ -1,6 +1,12 @@
 residence_limit = 90  # 45, 60
 schengen_constraint = 180
 
+# вынесли в функцию самую часто используемую операцию
+# в которой не хотелось бы ошибиться
+def date_difference (leave, arrive):
+	result = leave - arrive + 1
+	return result
+
 # сделали работу с длиной визитов более удобной
 def visit_length (visit):
 	return date_difference(visit[1], visit[0])
@@ -36,6 +42,13 @@ def print_days_future_visit(visits, date_in_future):
 	# assert days_in_es == 90 - 20 - 20
 	# обратите внимание, этой функции не нужен return
 
+def new_visit():
+	start = int(input('Дата въезда:'))
+	if start <= max(visits)[1]:
+		print('Дата въезда должна быть больше даты последнего выезда ({})'.format(max(visits)[1]))
+		return
+	print_days_future_visit(visits, start)
+
 def print_residence_limit_violation(visits):
 	days_for_visits = get_days_for_visits(visits)
 	
@@ -46,6 +59,13 @@ def print_residence_limit_violation(visits):
 	    if total_days > residence_limit:
 	        overstay_time = total_days - residence_limit
 	        print('Во время визита', visit, 'количество время пребывания превышено на', overstay_time, 'дней')
+
+def check_new_visit(start, end):
+	for visit in visits:
+		if not ((start <= end < visit[0]) or (visit[1] < start <= end)):
+			print('Новый визит пересекается с визитом {}'.format(visit))
+			return False
+	return True
 
 def add_visit():
 	print('Начало:')
@@ -62,13 +82,6 @@ def add_visit():
 		return
 	visits.append([start, end])
 
-def new_visit():
-	start = int(input('Дата въезда:'))
-	if start <= max(visits)[1]:
-		print('Дата въезда должна быть больше даты последнего выезда ({})'.format(max(visits)[1]))
-		return
-	print_days_future_visit(visits, start)
-	
 def delete_visit():
 	print('Начало:')
 	start = int(input())
@@ -80,8 +93,6 @@ def delete_visit():
 	visits.remove([start, end])
 	print('Визит {} успешно удален'.format([start, end]))
 
-visits = [[1, 10], [61, 90], [101, 110], [141, 160], [271, 290]]
-
 def check_one_visit(visit):
 	for another_visit in visits:
 		if visit == another_visit:
@@ -92,16 +103,32 @@ def check_one_visit(visit):
 	return True
 
 def check_visits():
-	for visit in visits:
-		if len(visit) != 2 or visit[0] > visit[1]:
-			print('Неправильно введен визит {}'.format(visit))
-			return False
-		if visits.count(visit) > 1:
-			print('Визит {} встречается в списке дважды'.format(visit))
-			return False
-		if not check_one_visit(visit):
-			return False
-	return True
+  for visit in visits:
+    if len(visit) != 2 or visit[0] > visit[1]:
+      print('Неправильно введен визит {}'.format(visit))
+      return False
+    if visits.count(visit) > 1:
+      print('Визит {} встречается в списке дважды'.format(visit))
+      return False
+    if not check_one_visit(visit):
+      return False
+  return True
+	
+def get_visits_from_file():
+  visits_new = []
+  file = open('visits.txt', 'r')
+  for line in file:
+    visits_new.append(list(map(int, line.split())))
+  file.close()
+  return visits_new
+
+def save_visits_in_file():
+    file = open('visits.txt', 'w')
+    for visit in visits:
+        file.write(str(visit[0]) + ' ' + str(visit[1]) + '\n')
+    file.close()
+
+visits = get_visits_from_file()
 
 # бесконечный цикл
 while True:
@@ -109,6 +136,7 @@ while True:
 	if not check_visits():
 		break
 	print_residence_limit_violation(visits)
+	print('Список визитов: {}'.format(visits))
 	#выбираю режим
 	print('v - добавить визит')
 	print('p - запланировать визит')
@@ -122,4 +150,6 @@ while True:
 	elif user_input == 'r':
 		delete_visit()
 	elif user_input == 'e':
-		break
+	  save_visits_in_file()
+	  break
+
