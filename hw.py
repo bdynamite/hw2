@@ -1,20 +1,6 @@
 residence_limit = 90  # 45, 60
 schengen_constraint = 180
 
-# так называть плохо
-def do_something():
-	# pass - способ объявить пустую функцию / список / условие
-	pass
-#так тоже
-def qqq():
-	pass
-
-# вынесли в функцию самую часто используемую операцию
-# в которой не хотелось бы ошибиться
-def date_difference (leave, arrive):
-	result = leave - arrive + 1
-	return result
-
 # сделали работу с длиной визитов более удобной
 def visit_length (visit):
 	return date_difference(visit[1], visit[0])
@@ -60,13 +46,6 @@ def print_residence_limit_violation(visits):
 	    if total_days > residence_limit:
 	        overstay_time = total_days - residence_limit
 	        print('Во время визита', visit, 'количество время пребывания превышено на', overstay_time, 'дней')
-
-def check_new_visit(start, end):
-	for visit in visits:
-		if not ((start <= end < visit[0]) or (visit[1] < start <= end)):
-			print('Новый визит пересекается с визитом {}'.format(visit))
-			return False
-	return True
 
 def add_visit():
 	print('Начало:')
