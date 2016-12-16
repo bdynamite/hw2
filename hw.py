@@ -73,7 +73,7 @@ def add_visit():
 	print('Конец:')
 	end = int(input())
 	if start > end:
-		print('Дата въезда не должна быть больше двты выезда')
+		print('Дата въезда не должна быть больше даты выезда')
 		return
 	if visits.count([start, end]) > 0:
 		print('Визит {} уже есть в списке'.format([start, end]))
@@ -124,6 +124,7 @@ def get_visits_from_file():
 
 def save_visits_in_file():
     file = open('visits.txt', 'w')
+    visits.sort()
     for visit in visits:
         file.write(str(visit[0]) + ' ' + str(visit[1]) + '\n')
     file.close()
@@ -145,11 +146,12 @@ while True:
 	user_input = input()
 	if user_input == 'v':
 		add_visit()
+		save_visits_in_file()
 	elif user_input == 'p':
 		new_visit()
 	elif user_input == 'r':
 		delete_visit()
+		save_visits_in_file()
 	elif user_input == 'e':
-	  save_visits_in_file()
 	  break
 
